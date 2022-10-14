@@ -1,0 +1,55 @@
+
+    -- F/A-18C Hornet parameters.
+    aoa.SLOW = 9.8
+    aoa.Slow = 9.3
+    aoa.OnSpeedMax = 8.8
+    aoa.OnSpeed = 8.1
+    aoa.OnSpeedMin = 7.4
+    aoa.Fast = 6.9
+    aoa.FAST = 6.3
+
+    -- F-14A/B Tomcat parameters (taken from NATOPS). Converted from units 0-30 to degrees.
+    -- Currently assuming a linear relationship with 0=-10 degrees and 30=+40 degrees as stated in NATOPS.
+
+    aoa.SLOW = self:_AoAUnit2Deg( playerData, 17.0 ) -- 18.33 --17.0 units
+    aoa.Slow = self:_AoAUnit2Deg( playerData, 16.0 ) -- 16.67 --16.0 units
+    aoa.OnSpeedMax = self:_AoAUnit2Deg( playerData, 15.5 ) -- 15.83 --15.5 units
+    aoa.OnSpeed = self:_AoAUnit2Deg( playerData, 15.0 ) -- 15.0  --15.0 units
+    aoa.OnSpeedMin = self:_AoAUnit2Deg( playerData, 14.5 ) -- 14.17 --14.5 units
+    aoa.Fast = self:_AoAUnit2Deg( playerData, 14.0 ) -- 13.33 --14.0 units
+    aoa.FAST = self:_AoAUnit2Deg( playerData, 13.0 ) -- 11.67 --13.0 units
+
+    -- T-45C Goshawk parameters.
+
+    aoa.SLOW = 8.00
+    aoa.Slow = 7.75
+    aoa.OnSpeedMax = 7.25
+    aoa.OnSpeed = 7.00
+    aoa.OnSpeedMin = 6.75
+    aoa.Fast = 6.25
+    aoa.FAST = 6.00
+
+    -- A-4E-C Skyhawk parameters
+
+    aoa.SLOW = 9.50
+    aoa.Slow = 9.25
+    aoa.OnSpeedMax = 9.00
+    aoa.OnSpeed = 8.75
+    aoa.OnSpeedMin = 8.50
+    aoa.Fast = 8.25
+    aoa.FAST = 8.00
+
+
+    -- AV-8B Harrier parameters.
+    aoa.SLOW       = 16.0
+    aoa.Slow       = 13.5
+    aoa.OnSpeedMax = 12.5
+    aoa.OnSpeed    = 10.0
+    aoa.OnSpeedMin =  9.5
+    aoa.Fast       =  8.0
+    aoa.FAST       =  7.5
+
+  end
+
+  return aoa
+end

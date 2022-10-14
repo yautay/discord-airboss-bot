@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CsvFileAttributes">
+    <option name="attributeMap">
+      <map>
+        <entry key="/assets/AIRBOSS-CVN-75_LSOgrades.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/assets/AIRBOSS-CVN-75_Trapsheet-237 _ Nygus_FA-18C_hornet-0001.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/assets/AIRBOSS-CVN_Trapsheet-Colt 2-1 _ Nygus_FA-18C_hornet-0001.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/assets/AIRBOSS-CVN_Trapsheet-Colt 2-1 _ Nygus_FA-18C_hornet-0002.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/assets/AIRBOSS-CVN_Trapsheet-Colt 2-1 _ Nygus_FA-18C_hornet-0003.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/assets/AIRBOSS-CVN_Trapsheet-Colt 2-1 _ Nygus_FA-18C_hornet-0005.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>
