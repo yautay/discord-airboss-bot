@@ -1,0 +1,19 @@
+Name,Pass,Points Final,Points Pass,Grade,Details,Wire,Tgroove,Case,Wind,Modex,Airframe,Carrier Type,Carrier Name,Theatre,Mission Time,Mission Date,OS Date
+Colt 2-1 | Nygus,1,n/a,1.0,WO,_FHOS_X _FHLUR_IM  _FHLUR_IC _FHLUR_AR,n/a,n/a,1,29.6,211,FA-18C_hornet,CVN_75,CVN,Caucasus,10:47:57+0,2016/6/21,Fri Jul  1 22:03:19 2022
+Colt 2-1 | Nygus,2,n/a,1.0,WO,_FHOS_X _FHLUR_IM  _FHLUR_IC _FHLUR_AR,n/a,n/a,1,29.5,211,FA-18C_hornet,CVN_75,CVN,Caucasus,10:50:27+0,2016/6/21,Fri Jul  1 22:05:49 2022
+Colt 2-1 | Nygus,3,n/a,0.0,CUT,_H_(LUL)X (F)HLULIM  F(H)LULIC (SLO)_LUL_AR,n/a,16.7,1,29.6,211,FA-18C_hornet,CVN_75,CVN,Caucasus,10:52:33+0,2016/6/21,Fri Jul  1 22:07:54 2022
+Colt 2-1 | Nygus,4,n/a,2.0,WOP,n/a,n/a,n/a,1,29.5,211,FA-18C_hornet,CVN_75,CVN,Caucasus,10:53:27+0,2016/6/21,Fri Jul  1 22:08:49 2022
+Colt 2-1 | Nygus,5,n/a,1.0,WO,_F_H(LUL)X _F_H(LUL) (DR)IM  (F)HLULIC H_LUL_AR,n/a,n/a,1,29.2,211,FA-18C_hornet,CVN_75,CVN,Caucasus,10:56:58+0,2016/6/21,Fri Jul  1 22:12:19 2022
+Colt 2-1 | Nygus,6,n/a,2.0,WOP,n/a,n/a,n/a,1,29.4,211,FA-18C_hornet,CVN_75,CVN,Caucasus,10:57:42+0,2016/6/21,Fri Jul  1 22:13:04 2022
+Colt 2-1 | Nygus,7,n/a,1.0,WO,_FH_OSX _FHLUR_IM  \SLOHLUL DLIC _FLOLUL_AR,n/a,n/a,1,29.6,211,FA-18C_hornet,CVN_75,CVN,Caucasus,11:00:51+0,2016/6/21,Fri Jul  1 22:16:13 2022
+Colt 2-1 | Nygus,8,n/a,2.0,WOP,n/a,n/a,n/a,1,29.2,211,FA-18C_hornet,CVN_75,CVN,Caucasus,11:01:52+0,2016/6/21,Fri Jul  1 22:17:14 2022
+Colt 2-1 | Nygus,9,1.1,0.0,CUT,_F_H_OS_X _F_H_LUR_ DLIM  F(H)LULIC (H)LULAR,n/a,26.5,1,29.6,211,FA-18C_hornet,CVN_75,CVN,Caucasus,11:12:36+0,2016/6/21,Fri Jul  1 22:27:57 2022
+Hornet 3-1 | Nygus,1,2,2.0,--,_F_(LUL)X (F)LULIM  (F)HLULIC HLULAR,3,27,1,29.1,018,FA-18C_hornet,CVN_75,CVN,Caucasus,09:22:07+0,2016/6/21,Fri Jun 17 22:46:41 2022
+Hornet 3-1 | Nygus,2,n/a,2.5,-- (BOLTER),(F)X   LULIC (H)LULAR,n/a,n/a,3,26,027,FA-18C_hornet,CVN_75,CVN,Caucasus,01:41:39+0,2016/6/21,Mon Jun 20 22:55:01 2022
+Hornet 3-1 | Nygus,3,2.3,2.0,--,_SLOLUROS_X _SLOLOLUR_IM  SLOLOLUL DLIC LULAR,4,n/a,3,26,027,FA-18C_hornet,CVN_75,CVN,Caucasus,01:47:15+0,2016/6/21,Mon Jun 20 23:00:37 2022
+Hornet 3-1 | Nygus,4,n/a,2.5,-- (BOLTER),(LUROS)X (FLO)LURIM  _F_(H)LURIC (HLUR)AR,n/a,n/a,3,26.1,025,FA-18C_hornet,CVN_75,CVN,Caucasus,01:28:12+0,2016/6/21,Tue Jun 21 22:13:48 2022
+Hornet 3-1 | Nygus,5,n/a,2.5,-- (BOLTER),   (LO)LULIC (F)LULAR,n/a,n/a,3,25.9,025,FA-18C_hornet,CVN_75,CVN,Caucasus,01:45:12+0,2016/6/21,Tue Jun 21 22:30:48 2022
+Hornet 3-1 | Nygus,6,2.7,3.0,(OK),(LO)X   LULIC (H)LULAR,n/a,n/a,3,25.8,025,FA-18C_hornet,CVN_75,CVN,Caucasus,02:02:31+0,2016/6/21,Tue Jun 21 22:48:07 2022
+Hornet 3-1 | Nygus,7,n/a,2.0,OWO,n/a,n/a,n/a,1,30.4,521,FA-18C_hornet,CVN_75,CVN,Caucasus,08:55:35+0,2016/6/21,Wed Jun 22 16:42:52 2022
+Hornet 3-1 | Nygus,8,n/a,2.0,WOP,n/a,n/a,n/a,1,30.2,521,FA-18C_hornet,CVN_75,CVN,Caucasus,08:55:41+0,2016/6/21,Wed Jun 22 16:42:58 2022
+Hornet 3-1 | Nygus,9,2,2.0,--,(F)HOSX _SLOH_(LUR) DLIM  _SLO_HLULIC (LUL)AR,n/a,27.3,1,30.2,521,FA-18C_hornet,CVN_75,CVN,Caucasus,09:00:43+0,2016/6/21,Wed Jun 22 16:48:00 2022
