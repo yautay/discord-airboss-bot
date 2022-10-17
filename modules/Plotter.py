@@ -37,9 +37,6 @@ class Plotter(object):
         self.__data = pd.read_csv(self.__filename, usecols=self.__columns)
         self.__airframe = self.__airframe_context()
 
-        # self.__data_aoa = self.__data[[K.x(), K.aoa()]]
-        # self.__data_grv = self.__data[[K.x(), K.z(), K.lue()]]
-        # self.__data_gs = self.__data[[K.x(), K.alt(), K.gse()]]
         self.__limits_aoa = self.__data_limits_aoa()
         self.__limits_grv = self.__data_limits_grv()
         self.__limits_gs = self.__data_limits_gs()
@@ -104,6 +101,28 @@ class Plotter(object):
                 GS.___lo___(): 2.6,
             }
 
+    def __data_limits_gse(self):
+        if self.__airframe == 9:
+            return {
+                GS.___hi___(): 1.5,
+                GS.__hi__(): 0.8,
+                GS.hi(): 0.4,
+                GS.gs(): 0,
+                GS.lo(): -0.3,
+                GS.__lo__(): -0.6,
+                GS.___lo___(): -0.9,
+            }
+        else:
+            return {
+                GS.___hi___(): 1.9,
+                GS.__hi__(): 1.4,
+                GS.hi(): 0.7,
+                GS.gs(): 0,
+                GS.lo(): -0.5,
+                GS.__lo__(): -1.2,
+                GS.___lo___(): -1.5,
+            }
+
     @staticmethod
     def __data_limits_grv():
         return {
@@ -154,12 +173,22 @@ class Plotter(object):
         gs__lo__limit = gs_limits_data[GS.__lo__()]
         gs___lo___limit = gs_limits_data[GS.___lo___()]
 
+        # GSE Limits
+        gse_limits_data = self.__data_limits_gse()
+        gse___hi___limit = gse_limits_data[GS.___hi___()]
+        gse__hi__limit = gse_limits_data[GS.__hi__()]
+        gse_hi_limit = gse_limits_data[GS.hi()]
+        gse_ok_limit = gse_limits_data[GS.gs()]
+        gse_lo_limit = gse_limits_data[GS.lo()]
+        gse__lo__limit = gse_limits_data[GS.__lo__()]
+        gse___lo___limit = gse_limits_data[GS.___lo___()]
+
         with plt.style.context('Solarize_Light2'):
             line_alpha = .3
             fill_alpha = .05
 
-            fig, (ax_grv, ax_gs, ax_aoa) = plt.subplots(3, sharex=True)
-            fig.set_size_inches(10, 15)
+            fig, (ax_grv, ax_gs, ax_aoa, utils) = plt.subplots(4, sharex=True)
+            fig.set_size_inches(15, 30)
 
             df_X_smooth = np.linspace(
                 Utils.mtrs_to_cbls(dta.X.min()),
@@ -182,7 +211,7 @@ class Plotter(object):
             ax_grv.set_ylim(grv_y_axis_limit_low, grv_y_axis_limit_hi)
             ax_grv.set_ylabel('lateral offset [Cbls]')
 
-            grv_longitudinal_correction_in_ft = 400
+            grv_longitudinal_correction_in_ft = 300
             grv_lateral_correction_in_ft = 0
 
             def grove_dev_component(grv_limit: float, x: float, fb_correction: float = 9,
@@ -301,7 +330,6 @@ class Plotter(object):
             gs_fill_limits(gs__lo__limit, gs___lo___limit, 'red')
             gs_fill_limits(gs__hi__limit, gs___hi___limit, 'red')
 
-
             f_gs = interp1d(Utils.mtrs_to_cbls(dta.X), dta.Alt, kind='quadratic')
             df_GS_smooth = f_gs(df_X_smooth)
             ax_gs.plot(df_X_smooth, df_GS_smooth, linewidth=.5, label="Track", color='black')
@@ -309,6 +337,43 @@ class Plotter(object):
 
             ax_gs.invert_xaxis()
             ax_gs.grid(False)
+
+            axins_gs = ax_gs.inset_axes([0, 0, .4, .4], transform=None, alpha=0.5, clip_path=None)
+            x1, x2, y1, y2 = 6, 0, gse___lo___limit - .5, gse___hi___limit + .5
+            axins_gs.set_xlim(x1, x2)
+            axins_gs.set_ylim(y1, y2)
+
+            def gse_plot_limits(limit, colour, label):
+                axins_gs.plot(
+                    numpy.linspace(limit, limit),
+                    color=colour, alpha=line_alpha, linestyle='--', linewidth=.5, label=label)
+
+            def gse_fill_limits(limit_1, limit_2, colour):
+                axins_gs.fill_between(
+                    numpy.linspace(x1, x2, x1),
+                    numpy.linspace(limit_1, limit_1, x1),
+                    numpy.linspace(limit_2, limit_2, x1),
+                    color=colour, alpha=fill_alpha)
+
+            gse_plot_limits(gse___hi___limit, 'red', '__HI__')
+            gse_plot_limits(gse__hi__limit, 'orange', 'H')
+            gse_plot_limits(gse_hi_limit, 'green', '(H)')
+            gse_plot_limits(gse_lo_limit, 'green', '(L)')
+            gse_plot_limits(gse__lo__limit, 'orange', 'L')
+            gse_plot_limits(gse___lo___limit, 'red', '__L__')
+
+            gse_fill_limits(gse___hi___limit, gse__hi__limit, 'red')
+            gse_fill_limits(gse__hi__limit, gse_hi_limit, 'orange')
+            gse_fill_limits(gse_hi_limit, gse_lo_limit, 'green')
+            gse_fill_limits(gse_lo_limit, gse__lo__limit, 'orange')
+            gse_fill_limits(gse__lo__limit, gse___lo___limit, 'red')
+
+            f_gs_gse = interp1d(Utils.mtrs_to_cbls(dta.X), dta.GSE, kind='quadratic')
+            df_GS_GSE = f_gs_gse(df_X_smooth)
+            axins_gs.plot(df_X_smooth, df_GS_GSE, linewidth=1, label="Track", color='black')
+            axins_gs.yaxis.tick_right()
+            axins_gs.grid(False)
+
 
             # AoA
             aoa_y_axis_limit_low = aoa_limits_data[AoA.fast_hi()] - .5
@@ -356,6 +421,44 @@ class Plotter(object):
 
             ax_aoa.invert_xaxis()
             ax_aoa.grid(False)
+
+            # UTILS
+
+            utils_y_axis_limit_lo = 0
+            utils_y_axis_limit_hi = 1
+            utils.set_ylim(aoa_y_axis_limit_low, aoa_y_axis_limit_hi)
+
+            axins_vy = utils.inset_axes([0, 0, .5, 1], transform=None, alpha=0.5, clip_path=None)
+            axins_roll = utils.inset_axes([.5, 0, .5, 1], transform=None, alpha=0.5, clip_path=None)
+            vyx1, vyx2, vyy1, vyy2 = 6, 0, -400, -1500
+            rx1, rx2, ry1, ry2 = 6, 0, 50, -50
+            axins_vy.set_xlim(vyx1, vyx2)
+            axins_vy.set_ylim(vyy1, vyy2)
+            axins_roll.set_xlim(rx1, rx2)
+            axins_roll.set_ylim(ry1, ry2)
+            axins_roll.yaxis.tick_right()
+            axins_vy.grid(False)
+            axins_roll.grid(False)
+
+            def plot_lin_limits(limit, colour, label):
+                axins_vy.plot(
+                    numpy.linspace(limit, limit),
+                    color=colour, alpha=line_alpha, linestyle='--', linewidth=.5, label=label)
+
+            def fill_lin_limits(limit_1, limit_2, colour):
+                axins_vy.fill_between(
+                    numpy.linspace(vyx1, vyx2, vyx1),
+                    numpy.linspace(limit_1, limit_1, vyx1),
+                    numpy.linspace(limit_2, limit_2, vyx1),
+                    color=colour, alpha=fill_alpha)
+
+            f_Vy = interp1d(Utils.mtrs_to_cbls(dta.X), dta.Vy, kind='quadratic')
+            df_Vy = f_Vy(df_X_smooth)
+            axins_vy.plot(df_X_smooth, df_Vy, linewidth=1, label="Track", color='black')
+
+            f_roll = interp1d(Utils.mtrs_to_cbls(dta.X), dta.Roll, kind='quadratic')
+            df_roll = f_roll(df_X_smooth)
+            axins_roll.plot(df_X_smooth, df_roll, linewidth=1, label="Track", color='black')
 
             plt.xlim(x_axis_limit_left, x_axis_limit_right)
             plt.xlabel('distance [Cbls]')
