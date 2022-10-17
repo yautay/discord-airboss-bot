@@ -45,6 +45,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/assets/AIRBOSS-CVN_Trapsheet-Hornet 3-1 _ Nygus_FA-18C_hornet-0002.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
       </map>
     </option>
   </component>
