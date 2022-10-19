@@ -477,6 +477,8 @@ class Plotter(object):
         axins_roll.yaxis.tick_right()
         axins_vy.grid(False)
         axins_roll.grid(False)
+        axins_roll.patch.set_alpha(0)
+        axins_vy.patch.set_alpha(0)
         axins_vy.set_xticks([0,1,2,3,4,5,6], [0,1,2,3,4,5,6])
         axins_roll.set_xticks([0, 1, 2, 3, 4, 5], [0, 1, 2, 3, 4, 5])
         axins_vy.set_ylabel('Vertical spd [ft/min]')
