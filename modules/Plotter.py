@@ -104,16 +104,6 @@ class Plotter(object):
     def __data_limits_gse(self):
         if self.__airframe == 9:
             return {
-                GS.___hi___(): 1.5,
-                GS.__hi__(): 0.8,
-                GS.hi(): 0.4,
-                GS.gs(): 0,
-                GS.lo(): -0.3,
-                GS.__lo__(): -0.6,
-                GS.___lo___(): -0.9,
-            }
-        else:
-            return {
                 GS.___hi___(): 1.9,
                 GS.__hi__(): 1.4,
                 GS.hi(): 0.7,
@@ -121,6 +111,16 @@ class Plotter(object):
                 GS.lo(): -0.5,
                 GS.__lo__(): -1.2,
                 GS.___lo___(): -1.5,
+            }
+        else:
+            return {
+                GS.___hi___(): 1.5,
+                GS.__hi__(): 0.8,
+                GS.hi(): 0.4,
+                GS.gs(): 0,
+                GS.lo(): -0.3,
+                GS.__lo__(): -0.6,
+                GS.___lo___(): -0.9,
             }
 
     @staticmethod
@@ -135,7 +135,7 @@ class Plotter(object):
             GRV.___lur___(): 3,
         }
 
-    def plot_case1(self):
+    def plot_case1(self, fillins: bool = False):
         dta = self.__data
 
         # X-axis setup [cbls]
@@ -183,285 +183,340 @@ class Plotter(object):
         gse__lo__limit = gse_limits_data[GS.__lo__()]
         gse___lo___limit = gse_limits_data[GS.___lo___()]
 
-        with plt.style.context('Solarize_Light2'):
-            line_alpha = .3
-            fill_alpha = .05
+        line_alpha = .3
+        fill_alpha = .05
+        track_line_width = .75
+        track_line_colour = 'black'
 
-            fig, (ax_grv, ax_gs, ax_aoa, utils) = plt.subplots(4, sharex=True)
-            fig.set_size_inches(15, 30)
+        fig, (ax_grv, ax_gs, ax_aoa, utils) = plt.subplots(4)
+        fig.set_size_inches(15, 25)
 
-            df_X_smooth = np.linspace(
-                Utils.mtrs_to_cbls(dta.X.min()),
-                Utils.mtrs_to_cbls(dta.X.max()),
-                int(len(dta.X) * 100))
+        df_X_smooth = np.linspace(
+            Utils.mtrs_to_cbls(dta.X.min()),
+            Utils.mtrs_to_cbls(dta.X.max()),
+            int(len(dta.X) * 100))
 
-            def plot_distance_marks(axe):
-                axe.axvline(x=Utils.mile_quarts(1, mtrs=False, cbls=True), color='black', alpha=.15, linestyle='--',
-                               linewidth=1, label="1/4 Nm")
-                axe.axvline(x=Utils.mile_quarts(2, mtrs=False, cbls=True), color='black', alpha=.15, linestyle='--',
-                               linewidth=1, label="1/2 Nm'")
-                axe.axvline(x=Utils.mile_quarts(3, mtrs=False, cbls=True), color='red', alpha=.75, linestyle='--',
-                               linewidth=1, label="3/4 Nm'")
-                axe.axvline(x=Utils.mile_quarts(4, mtrs=False, cbls=True), color='black', alpha=.15, linestyle='--',
-                               linewidth=1, label="1 Nm'")
+        def plot_distance_marks(axe):
+            axe.axvline(x=Utils.mile_quarts(1, mtrs=False, cbls=True), color='black', alpha=.15, linestyle='--',
+                        linewidth=1, label="1/4 Nm")
+            axe.axvline(x=Utils.mile_quarts(2, mtrs=False, cbls=True), color='black', alpha=.15, linestyle='--',
+                        linewidth=1, label="1/2 Nm'")
+            axe.axvline(x=Utils.mile_quarts(3, mtrs=False, cbls=True), color='red', alpha=.75, linestyle='--',
+                        linewidth=1, label="3/4 Nm'")
+            axe.axvline(x=Utils.mile_quarts(4, mtrs=False, cbls=True), color='black', alpha=.15, linestyle='--',
+                        linewidth=1, label="1 Nm'")
 
-            # GROOVE
-            grv_y_axis_limit_low = 2.5
-            grv_y_axis_limit_hi = -.2
-            ax_grv.set_ylim(grv_y_axis_limit_low, grv_y_axis_limit_hi)
-            ax_grv.set_ylabel('lateral offset [Cbls]')
+        # GROOVE
+        grv_y_axis_limit_low = 2.5
+        grv_y_axis_limit_hi = -.2
+        ax_grv.set_ylim(grv_y_axis_limit_low, grv_y_axis_limit_hi)
+        ax_grv.set_ylabel('lateral offset [Cbls]')
+        ax_grv.set_xlabel("distance [Cbls]")
+        ax_grv.set_xlim(x_axis_limit_right, x_axis_limit_left)
 
-            grv_longitudinal_correction_in_ft = 300
-            grv_lateral_correction_in_ft = 0
+        grv_longitudinal_correction_in_ft = 290
+        grv_lateral_correction_in_ft = 0
 
-            def grove_dev_component(grv_limit: float, x: float, fb_correction: float = 9,
-                                    lateral_correction: float = grv_lateral_correction_in_ft) -> float:
-                rads = math.radians(grv_limit + fb_correction)
-                return math.tan(rads) * x + Utils.feet_to_cbl(lateral_correction)
+        def grove_dev_component(grv_limit: float, x: float, fb_correction: float = 9,
+                                lateral_correction: float = grv_lateral_correction_in_ft) -> float:
+            rads = math.radians(grv_limit + fb_correction)
+            return math.tan(rads) * x + Utils.feet_to_cbl(lateral_correction)
 
-            def grv_plot_limits(limit, colour, label):
-                ax_grv.plot(
-                    limits_x_axis + Utils.feet_to_cbl(grv_longitudinal_correction_in_ft),
-                    grove_dev_component(limit, limits_x_axis),
-                    color=colour, alpha=line_alpha, linestyle='--', linewidth=.5, label=label)
+        def grv_plot_limits(limit, colour, label):
+            ax_grv.plot(
+                limits_x_axis + Utils.feet_to_cbl(grv_longitudinal_correction_in_ft),
+                grove_dev_component(limit, limits_x_axis),
+                color=colour, alpha=line_alpha, linestyle='--', linewidth=1, label=label)
 
-            def grv_fill_limits(limit_1, limit_2, colour):
-                ax_grv.fill_between(
-                    limits_x_axis + Utils.feet_to_cbl(grv_longitudinal_correction_in_ft),
-                    grove_dev_component(limit_1, limits_x_axis),
-                    grove_dev_component(limit_2, limits_x_axis),
-                    color=colour, alpha=fill_alpha)
+        def grv_fill_limits(limit_1, limit_2, colour):
+            ax_grv.fill_between(
+                limits_x_axis + Utils.feet_to_cbl(grv_longitudinal_correction_in_ft),
+                grove_dev_component(limit_1, limits_x_axis),
+                grove_dev_component(limit_2, limits_x_axis),
+                color=colour, alpha=fill_alpha)
 
-            grv_plot_limits(grv___lul___limit, 'red', '__LUL__')
-            grv_plot_limits(grv__lul__limit, 'orange', 'LUL')
-            grv_plot_limits(grv_lul_limit, 'green', '(LUL)')
-            grv_plot_limits(grv_ok_limit, 'black', '__OK__')
-            grv_plot_limits(grv_lur_limit, 'green', '(LUR)')
-            grv_plot_limits(grv__lur__limit, 'orange', 'LUR')
-            grv_plot_limits(grv___lur___limit, 'red', '__LUR__')
+        grv_plot_limits(grv___lul___limit, 'red', '__LUL__')
+        grv_plot_limits(grv__lul__limit, 'orange', 'LUL')
+        grv_plot_limits(grv_lul_limit, 'green', '(LUL)')
+        # grv_plot_limits(grv_ok_limit, 'black', '__OK__')
+        grv_plot_limits(grv_lur_limit, 'green', '(LUR)')
+        grv_plot_limits(grv__lur__limit, 'orange', 'LUR')
+        grv_plot_limits(grv___lur___limit, 'red', '__LUR__')
 
+        if fillins:
             grv_fill_limits(grv_lul_limit, grv_lur_limit, 'green')
             grv_fill_limits(grv_lul_limit, grv__lul__limit, 'orange')
             grv_fill_limits(grv_lur_limit, grv__lur__limit, 'orange')
             grv_fill_limits(grv__lul__limit, grv___lul___limit, 'red')
             grv_fill_limits(grv__lur__limit, grv___lur___limit, 'red')
 
+        try:
             f_grv = interp1d(Utils.mtrs_to_cbls(dta.X), Utils.mtrs_to_cbls(dta.Z), kind='quadratic')
             df_GRV_smooth = f_grv(df_X_smooth)
-            ax_grv.plot(df_X_smooth, df_GRV_smooth, linewidth=.5, label="Track", color='black')
-            plot_distance_marks(ax_grv)
+            ax_grv.plot(df_X_smooth, df_GRV_smooth, linewidth=track_line_width, label="Track",
+                        color=track_line_colour)
+        except:
+            ax_grv.plot(Utils.mtrs_to_cbls(dta.X), Utils.mtrs_to_cbls(dta.Z), linewidth=track_line_width,
+                        label="Track", color=track_line_colour)
 
-            ax_grv.invert_xaxis()
-            ax_grv.grid(False)
+        plot_distance_marks(ax_grv)
 
-            axins_grv = ax_grv.inset_axes([.6, 0, .4, .4], transform=None, alpha=0.5, clip_path=None)
-            x1, x2, y1, y2 = 6, 0, -7, 7
-            axins_grv.set_xlim(x1, x2)
-            axins_grv.set_ylim(y1, y2)
+        ax_grv.invert_xaxis()
+        ax_grv.grid(False)
 
-            def lue_plot_limits(limit, colour, label):
-                axins_grv.plot(
-                    numpy.linspace(limit, limit),
-                    color=colour, alpha=line_alpha, linestyle='--', linewidth=.5, label=label)
+        axins_grv = ax_grv.inset_axes([.6, 0, .4, .4], transform=None, alpha=0.5, clip_path=None)
+        x1, x2, y1, y2 = 6, 0, -4, 4
+        axins_grv.set_xlim(x1, x2)
+        axins_grv.set_ylim(y1, y2)
 
-            def lue_fill_limits(limit_1, limit_2, colour):
-                axins_grv.fill_between(
-                    numpy.linspace(x1, x2, x1),
-                    numpy.linspace(limit_1, limit_1, x1),
-                    numpy.linspace(limit_2, limit_2, x1),
-                    color=colour, alpha=fill_alpha)
+        def lue_plot_limits(limit, colour, label):
+            axins_grv.plot(
+                numpy.linspace(limit, limit),
+                color=colour, alpha=line_alpha, linestyle='--', linewidth=1, label=label)
 
-            lue_plot_limits(grv___lul___limit, 'red', '__LUL__')
-            lue_plot_limits(grv__lul__limit, 'orange', 'LUL')
-            lue_plot_limits(grv_lul_limit, 'green', '(LUL)')
-            lue_plot_limits(grv_lur_limit, 'green', '(LUR)')
-            lue_plot_limits(grv__lur__limit, 'orange', 'LUR')
-            lue_plot_limits(grv___lur___limit, 'red', '__LUL__')
+        def lue_fill_limits(limit_1, limit_2, colour):
+            axins_grv.fill_between(
+                numpy.linspace(x1, x2, x1),
+                numpy.linspace(limit_1, limit_1, x1),
+                numpy.linspace(limit_2, limit_2, x1),
+                color=colour, alpha=fill_alpha)
 
+        lue_plot_limits(grv___lul___limit, 'red', '__LUL__')
+        lue_plot_limits(grv__lul__limit, 'orange', 'LUL')
+        lue_plot_limits(grv_lul_limit, 'green', '(LUL)')
+        lue_plot_limits(grv_lur_limit, 'green', '(LUR)')
+        lue_plot_limits(grv__lur__limit, 'orange', 'LUR')
+        lue_plot_limits(grv___lur___limit, 'red', '__LUL__')
+
+        if fillins:
             lue_fill_limits(grv___lul___limit, grv__lul__limit, 'red')
             lue_fill_limits(grv__lul__limit, grv_lul_limit, 'orange')
             lue_fill_limits(grv_lul_limit, grv_lur_limit, 'green')
             lue_fill_limits(grv_lur_limit, grv__lur__limit, 'orange')
             lue_fill_limits(grv__lur__limit, grv___lur___limit, 'red')
 
-
+        try:
             f_grv_lue = interp1d(Utils.mtrs_to_cbls(dta.X), dta.LUE, kind='quadratic')
             df_GRV_LUE = f_grv_lue(df_X_smooth)
-            axins_grv.plot(df_X_smooth, df_GRV_LUE, linewidth=.5, label="Track", color='black')
-            axins_grv.invert_yaxis()
-            axins_grv.grid(False)
+            axins_grv.plot(df_X_smooth, df_GRV_LUE, linewidth=track_line_width, label="Track",
+                           color=track_line_colour)
+        except:
+            axins_grv.plot(Utils.mtrs_to_cbls(dta.X), dta.LUE, linewidth=track_line_width, label="Track",
+                           color=track_line_colour)
 
-            # GLIDESLOPE
-            gs_y_axis_limit_low = 0
-            gs_y_axis_limit_hi = dta.Alt.max() + 50
-            ax_gs.set_ylim(gs_y_axis_limit_low, gs_y_axis_limit_hi)
-            ax_gs.set_ylabel('height [feet]')
+        axins_grv.yaxis.tick_right()
+        axins_grv.xaxis.tick_top()
+        axins_grv.invert_yaxis()
+        axins_grv.grid(False)
 
-            gs_longitudinal_correction_in_ft = 250
+        # GLIDESLOPE
+        gs_y_axis_limit_low = 0
+        gs_y_axis_limit_hi = 850
+        ax_gs.set_ylim(gs_y_axis_limit_low, gs_y_axis_limit_hi)
+        ax_gs.set_xlim(x_axis_limit_right, x_axis_limit_left)
+        ax_gs.set_ylabel('height [feet]')
+        ax_gs.set_xlabel("distance [Cbls]")
 
-            def glideslope_alt_component(gs_limit: float, x: float) -> float:
-                rads = math.radians(gs_limit)
-                return math.tan(rads) * x
+        gs_longitudinal_correction_in_ft = 290
+        gs_vertical_correction_in_ft = 0
 
-            def gs_plot_limits(limit, colour, label):
-                ax_gs.plot(
-                    limits_x_axis + Utils.feet_to_cbl(gs_longitudinal_correction_in_ft),
-                    glideslope_alt_component(limit, Utils.cbl_to_feet(limits_x_axis))
-                    , color=colour, alpha=line_alpha, linestyle='--', linewidth=.5, label=label)
+        def glideslope_alt_component(gs_limit: float, x: float) -> float:
+            rads = math.radians(gs_limit)
+            return math.tan(rads) * x + gs_vertical_correction_in_ft
 
-            def gs_fill_limits(limit_1, limit_2, colour):
-                ax_gs.fill_between(
-                    limits_x_axis + Utils.feet_to_cbl(gs_longitudinal_correction_in_ft),
-                    glideslope_alt_component(limit_1, Utils.cbl_to_feet(limits_x_axis)),
-                    glideslope_alt_component(limit_2, Utils.cbl_to_feet(limits_x_axis)),
-                    color=colour, alpha=fill_alpha)
+        def gs_plot_limits(limit, colour, label):
+            ax_gs.plot(
+                limits_x_axis + Utils.feet_to_cbl(gs_longitudinal_correction_in_ft),
+                glideslope_alt_component(limit, Utils.cbl_to_feet(limits_x_axis))
+                , color=colour, alpha=line_alpha, linestyle='--', linewidth=1, label=label)
 
-            gs_plot_limits(gs___hi___limit, 'red', '__HI__')
-            gs_plot_limits(gs__hi__limit, 'orange', 'H')
-            gs_plot_limits(gs_hi_limit, 'green', '(H)')
-            gs_plot_limits(gs_ok_limit, 'black', '__OK__')
-            gs_plot_limits(gs_lo_limit, 'green', '(LO)')
-            gs_plot_limits(gs__lo__limit, 'orange', 'LO')
-            gs_plot_limits(gs___lo___limit, 'red', '__LO__')
+        def gs_fill_limits(limit_1, limit_2, colour):
+            ax_gs.fill_between(
+                limits_x_axis + Utils.feet_to_cbl(gs_longitudinal_correction_in_ft),
+                glideslope_alt_component(limit_1, Utils.cbl_to_feet(limits_x_axis)),
+                glideslope_alt_component(limit_2, Utils.cbl_to_feet(limits_x_axis)),
+                color=colour, alpha=fill_alpha)
 
+        gs_plot_limits(gs___hi___limit, 'red', '__HI__')
+        gs_plot_limits(gs__hi__limit, 'orange', 'H')
+        gs_plot_limits(gs_hi_limit, 'green', '(H)')
+        # gs_plot_limits(gs_ok_limit, 'black', '__OK__')
+        gs_plot_limits(gs_lo_limit, 'green', '(LO)')
+        gs_plot_limits(gs__lo__limit, 'orange', 'LO')
+        gs_plot_limits(gs___lo___limit, 'red', '__LO__')
+
+        if fillins:
             gs_fill_limits(gs_lo_limit, gs_hi_limit, 'green')
             gs_fill_limits(gs_lo_limit, gs__lo__limit, 'orange')
             gs_fill_limits(gs_hi_limit, gs__hi__limit, 'orange')
             gs_fill_limits(gs__lo__limit, gs___lo___limit, 'red')
             gs_fill_limits(gs__hi__limit, gs___hi___limit, 'red')
 
+        try:
             f_gs = interp1d(Utils.mtrs_to_cbls(dta.X), dta.Alt, kind='quadratic')
             df_GS_smooth = f_gs(df_X_smooth)
-            ax_gs.plot(df_X_smooth, df_GS_smooth, linewidth=.5, label="Track", color='black')
-            plot_distance_marks(ax_gs)
+            ax_gs.plot(df_X_smooth, df_GS_smooth, linewidth=track_line_width, label="Track",
+                       color=track_line_colour)
+        except:
+            ax_gs.plot(Utils.mtrs_to_cbls(dta.X), dta.Alt, linewidth=track_line_width, label="Track",
+                       color=track_line_colour)
 
-            ax_gs.invert_xaxis()
-            ax_gs.grid(False)
+        plot_distance_marks(ax_gs)
 
-            axins_gs = ax_gs.inset_axes([0, 0, .4, .4], transform=None, alpha=0.5, clip_path=None)
-            x1, x2, y1, y2 = 6, 0, gse___lo___limit - .5, gse___hi___limit + .5
-            axins_gs.set_xlim(x1, x2)
-            axins_gs.set_ylim(y1, y2)
+        ax_gs.invert_xaxis()
+        ax_gs.grid(False)
 
-            def gse_plot_limits(limit, colour, label):
-                axins_gs.plot(
-                    numpy.linspace(limit, limit),
-                    color=colour, alpha=line_alpha, linestyle='--', linewidth=.5, label=label)
+        axins_gs = ax_gs.inset_axes([.6, .6, .4, .4], transform=None, alpha=0.5, clip_path=None)
+        x1, x2, y1, y2 = 6, 0, gse___lo___limit - .5, gse___hi___limit + .5
+        axins_gs.set_xlim(x1, x2)
+        axins_gs.set_ylim(y1, y2)
 
-            def gse_fill_limits(limit_1, limit_2, colour):
-                axins_gs.fill_between(
-                    numpy.linspace(x1, x2, x1),
-                    numpy.linspace(limit_1, limit_1, x1),
-                    numpy.linspace(limit_2, limit_2, x1),
-                    color=colour, alpha=fill_alpha)
+        def gse_plot_limits(limit, colour, label):
+            axins_gs.plot(
+                numpy.linspace(limit, limit),
+                color=colour, alpha=line_alpha, linestyle='--', linewidth=1, label=label)
 
-            gse_plot_limits(gse___hi___limit, 'red', '__HI__')
-            gse_plot_limits(gse__hi__limit, 'orange', 'H')
-            gse_plot_limits(gse_hi_limit, 'green', '(H)')
-            gse_plot_limits(gse_lo_limit, 'green', '(L)')
-            gse_plot_limits(gse__lo__limit, 'orange', 'L')
-            gse_plot_limits(gse___lo___limit, 'red', '__L__')
+        def gse_fill_limits(limit_1, limit_2, colour):
+            axins_gs.fill_between(
+                numpy.linspace(x1, x2, x1),
+                numpy.linspace(limit_1, limit_1, x1),
+                numpy.linspace(limit_2, limit_2, x1),
+                color=colour, alpha=fill_alpha)
 
+        gse_plot_limits(gse___hi___limit, 'red', '__HI__')
+        gse_plot_limits(gse__hi__limit, 'orange', 'H')
+        gse_plot_limits(gse_hi_limit, 'green', '(H)')
+        gse_plot_limits(gse_lo_limit, 'green', '(L)')
+        gse_plot_limits(gse__lo__limit, 'orange', 'L')
+        gse_plot_limits(gse___lo___limit, 'red', '__L__')
+
+        if fillins:
             gse_fill_limits(gse___hi___limit, gse__hi__limit, 'red')
             gse_fill_limits(gse__hi__limit, gse_hi_limit, 'orange')
             gse_fill_limits(gse_hi_limit, gse_lo_limit, 'green')
             gse_fill_limits(gse_lo_limit, gse__lo__limit, 'orange')
             gse_fill_limits(gse__lo__limit, gse___lo___limit, 'red')
 
+        try:
             f_gs_gse = interp1d(Utils.mtrs_to_cbls(dta.X), dta.GSE, kind='quadratic')
             df_GS_GSE = f_gs_gse(df_X_smooth)
-            axins_gs.plot(df_X_smooth, df_GS_GSE, linewidth=1, label="Track", color='black')
-            axins_gs.yaxis.tick_right()
-            axins_gs.grid(False)
+            axins_gs.plot(df_X_smooth, df_GS_GSE, linewidth=track_line_width, label="Track",
+                          color=track_line_colour)
+        except:
+            axins_gs.plot(Utils.mtrs_to_cbls(dta.X), dta.GSE, linewidth=track_line_width, label="Track",
+                          color=track_line_colour)
 
+        axins_gs.yaxis.tick_right()
+        axins_gs.grid(False)
 
-            # AoA
-            aoa_y_axis_limit_low = aoa_limits_data[AoA.fast_hi()] - .5
-            aoa_y_axis_limit_hi = aoa_limits_data[AoA.slo_hi()] + .5
-            ax_aoa.set_ylim(aoa_y_axis_limit_low, aoa_y_axis_limit_hi)
-            ax_aoa.set_ylabel('AoA [deg]')
+        # AoA
+        aoa_y_axis_limit_low = aoa_limits_data[AoA.fast_hi()] - .5
+        aoa_y_axis_limit_hi = aoa_limits_data[AoA.slo_hi()] + .5
+        ax_aoa.set_ylim(aoa_y_axis_limit_low, aoa_y_axis_limit_hi)
+        ax_aoa.set_xlim(x_axis_limit_right, x_axis_limit_left)
+        ax_aoa.set_ylabel('AoA [deg]')
+        ax_aoa.set_xlabel("distance [Cbls]")
 
-            def aoa_plot_limits(limit, colour, label):
-                ax_aoa.plot(
-                    numpy.linspace(limit, limit, x_axis_limit_left),
-                    color=colour, alpha=line_alpha, linestyle='--', linewidth=.5, label=label)
+        def aoa_plot_limits(limit, colour, label):
+            ax_aoa.plot(
+                numpy.linspace(limit, limit, x_axis_limit_left),
+                color=colour, alpha=line_alpha, linestyle='--', linewidth=1, label=label)
 
-            def aoa_fill_limits(limit_1, limit_2, colour):
-                ax_aoa.fill_between(
-                    limits_x_axis,
-                    numpy.linspace(limit_1, limit_1, x_axis_limit_left),
-                    numpy.linspace(limit_2, limit_2, x_axis_limit_left),
-                    color=colour, alpha=.03)
+        def aoa_fill_limits(limit_1, limit_2, colour):
+            ax_aoa.fill_between(
+                limits_x_axis,
+                numpy.linspace(limit_1, limit_1, x_axis_limit_left),
+                numpy.linspace(limit_2, limit_2, x_axis_limit_left),
+                color=colour, alpha=.03)
 
-            aoa_plot_limits(aoa_slo_hi_limit, 'red', "__SLO__")
-            aoa_plot_limits(aoa_slo_med_limit, 'orange', "SLO")
-            aoa_plot_limits(aoa_slo_lo_limit, 'green', "(SLO)")
-            aoa_plot_limits(aoa_ok_limit, 'black', "__OK__")
-            aoa_plot_limits(aoa_fst_lo_limit, 'green', "(F)")
-            aoa_plot_limits(aoa_fst_med_limit, 'orange', "F")
-            aoa_plot_limits(aoa_fst_hi_limit, 'red', "__F__")
+        aoa_plot_limits(aoa_slo_hi_limit, 'red', "__SLO__")
+        aoa_plot_limits(aoa_slo_med_limit, 'orange', "SLO")
+        aoa_plot_limits(aoa_slo_lo_limit, 'green', "(SLO)")
+        # aoa_plot_limits(aoa_ok_limit, 'black', "__OK__")
+        aoa_plot_limits(aoa_fst_lo_limit, 'green', "(F)")
+        aoa_plot_limits(aoa_fst_med_limit, 'orange', "F")
+        aoa_plot_limits(aoa_fst_hi_limit, 'red', "__F__")
 
+        if fillins:
             aoa_fill_limits(aoa_slo_hi_limit, aoa_slo_med_limit, 'red')
             aoa_fill_limits(aoa_slo_med_limit, aoa_slo_lo_limit, 'orange')
             aoa_fill_limits(aoa_slo_lo_limit, aoa_fst_lo_limit, 'green')
             aoa_fill_limits(aoa_fst_lo_limit, aoa_fst_med_limit, 'orange')
             aoa_fill_limits(aoa_fst_med_limit, aoa_fst_hi_limit, 'red')
 
-
+        try:
             f_aoa = interp1d(Utils.mtrs_to_cbls(dta.X), dta.AoA, kind='quadratic')
             df_AoA_smooth = f_aoa(df_X_smooth)
-            ax_aoa.plot(df_X_smooth, df_AoA_smooth, linewidth=.5, label="Track", color='black')
-            ax_aoa.fill_between(df_X_smooth, df_AoA_smooth, aoa_ok_limit,
-                                where=df_AoA_smooth < aoa_slo_lo_limit, color='yellow', alpha=.2)
-            ax_aoa.fill_between(df_X_smooth, df_AoA_smooth, aoa_ok_limit,
-                                where=df_AoA_smooth > aoa_slo_lo_limit, color='green', alpha=.2)
-            ax_aoa.fill_between(df_X_smooth, df_AoA_smooth, aoa_ok_limit,
-                                where=df_AoA_smooth < aoa_fst_lo_limit, color='red', alpha=.2)
-            plot_distance_marks(ax_aoa)
+            ax_aoa.plot(df_X_smooth, df_AoA_smooth, linewidth=track_line_width, label="Track",
+                        color=track_line_colour)
+        except:
+            ax_aoa.plot(Utils.mtrs_to_cbls(dta.X), dta.AoA, linewidth=track_line_width, label="Track",
+                        color=track_line_colour)
 
-            ax_aoa.invert_xaxis()
-            ax_aoa.grid(False)
+        plot_distance_marks(ax_aoa)
 
-            # UTILS
+        ax_aoa.invert_xaxis()
+        ax_aoa.grid(False)
 
-            utils_y_axis_limit_lo = 0
-            utils_y_axis_limit_hi = 1
-            utils.set_ylim(aoa_y_axis_limit_low, aoa_y_axis_limit_hi)
+        # UTILS
+        utils.set_xticks([], [])
+        utils.set_yticks([], [])
 
-            axins_vy = utils.inset_axes([0, 0, .5, 1], transform=None, alpha=0.5, clip_path=None)
-            axins_roll = utils.inset_axes([.5, 0, .5, 1], transform=None, alpha=0.5, clip_path=None)
-            vyx1, vyx2, vyy1, vyy2 = 6, 0, -400, -1500
-            rx1, rx2, ry1, ry2 = 6, 0, 50, -50
-            axins_vy.set_xlim(vyx1, vyx2)
-            axins_vy.set_ylim(vyy1, vyy2)
-            axins_roll.set_xlim(rx1, rx2)
-            axins_roll.set_ylim(ry1, ry2)
-            axins_roll.yaxis.tick_right()
-            axins_vy.grid(False)
-            axins_roll.grid(False)
+        utils_y_axis_limit_lo = 0
+        utils_y_axis_limit_hi = 1
+        utils.set_ylim(utils_y_axis_limit_lo, utils_y_axis_limit_hi)
 
-            def plot_lin_limits(limit, colour, label):
-                axins_vy.plot(
-                    numpy.linspace(limit, limit),
-                    color=colour, alpha=line_alpha, linestyle='--', linewidth=.5, label=label)
+        axins_vy = utils.inset_axes([0, 0, .5, 1], transform=None, alpha=0.5, clip_path=None)
+        axins_roll = utils.inset_axes([.5, 0, .5, 1], transform=None, alpha=0.5, clip_path=None)
+        vyx1, vyx2, vyy1, vyy2 = 6, 0, -400, -1500
+        rx1, rx2, ry1, ry2 = 6, 0, 50, -50
+        axins_vy.set_xlim(vyx1, vyx2)
+        axins_vy.set_ylim(vyy1, vyy2)
+        axins_roll.set_xlim(rx1, rx2)
+        axins_roll.set_ylim(ry1, ry2)
+        axins_roll.yaxis.tick_right()
+        axins_vy.grid(False)
+        axins_roll.grid(False)
+        axins_vy.set_xticks([0,1,2,3,4,5,6], [0,1,2,3,4,5,6])
+        axins_roll.set_xticks([0, 1, 2, 3, 4, 5], [0, 1, 2, 3, 4, 5])
+        axins_vy.set_ylabel('Vertical spd [ft/min]')
+        axins_vy.set_xlabel("distance [Cbls]")
+        axins_roll.set_ylabel('Bank Angle [deg]')
+        axins_roll.yaxis.set_label_position("right")
+        axins_roll.set_xlabel("distance [Cbls]")
 
-            def fill_lin_limits(limit_1, limit_2, colour):
-                axins_vy.fill_between(
-                    numpy.linspace(vyx1, vyx2, vyx1),
-                    numpy.linspace(limit_1, limit_1, vyx1),
-                    numpy.linspace(limit_2, limit_2, vyx1),
-                    color=colour, alpha=fill_alpha)
+        def plot_lin_limits(limit, colour, label, axin):
+            axin.plot(
+                numpy.linspace(limit, limit),
+                color=colour, alpha=line_alpha, linestyle='--', linewidth=1, label=label)
 
+        def fill_lin_limits(limit_1, limit_2, colour, axin):
+            axin.fill_between(
+                numpy.linspace(vyx1, vyx2, vyx1),
+                numpy.linspace(limit_1, limit_1, vyx1),
+                numpy.linspace(limit_2, limit_2, vyx1),
+                color=colour, alpha=fill_alpha)
+
+        plot_lin_limits(-825, 'red', 'Vy limit', axins_vy)
+
+        plot_lin_limits(-2.5, 'green', 'roll limit', axins_roll)
+        plot_lin_limits(2.5, 'green', 'roll limit', axins_roll)
+
+        try:
             f_Vy = interp1d(Utils.mtrs_to_cbls(dta.X), dta.Vy, kind='quadratic')
             df_Vy = f_Vy(df_X_smooth)
-            axins_vy.plot(df_X_smooth, df_Vy, linewidth=1, label="Track", color='black')
+            axins_vy.plot(df_X_smooth, df_Vy, linewidth=track_line_width, label="Track", color=track_line_colour)
 
             f_roll = interp1d(Utils.mtrs_to_cbls(dta.X), dta.Roll, kind='quadratic')
             df_roll = f_roll(df_X_smooth)
-            axins_roll.plot(df_X_smooth, df_roll, linewidth=1, label="Track", color='black')
+            axins_roll.plot(df_X_smooth, df_roll, linewidth=track_line_width, label="Track",
+                            color=track_line_colour)
+        except:
+            axins_vy.plot(Utils.mtrs_to_cbls(dta.X), dta.Vy, linewidth=track_line_width, label="Track", color=track_line_colour)
+            axins_roll.plot(Utils.mtrs_to_cbls(dta.X), dta.Roll, linewidth=track_line_width, label="Track", color=track_line_colour)
 
-            plt.xlim(x_axis_limit_left, x_axis_limit_right)
-            plt.xlabel('distance [Cbls]')
+        plt.xlim(x_axis_limit_left, x_axis_limit_right)
 
-            plt.savefig('POC.png', bbox_inches='tight', dpi=300)
-            plt.show()
+        plt.savefig('POC.png', bbox_inches='tight', dpi=300)
+        plt.savefig('POC_alpha.png', bbox_inches='tight', dpi=300, transparent=True)
+        plt.show()
