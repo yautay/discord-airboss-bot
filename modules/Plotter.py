@@ -307,6 +307,7 @@ class Plotter(object):
         axins_grv.yaxis.tick_right()
         axins_grv.xaxis.tick_top()
         axins_grv.invert_yaxis()
+        axins_grv.patch.set_alpha(0)
         axins_grv.grid(False)
 
         # GLIDESLOPE
@@ -406,6 +407,7 @@ class Plotter(object):
             axins_gs.plot(Utils.mtrs_to_cbls(dta.X), dta.GSE, linewidth=track_line_width, label="Track",
                           color=track_line_colour)
 
+        axins_gs.patch.set_alpha(0)
         axins_gs.yaxis.tick_right()
         axins_gs.grid(False)
 
