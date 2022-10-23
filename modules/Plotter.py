@@ -7,7 +7,7 @@ from matplotlib import pyplot as plt
 from scipy.interpolate import interp1d
 
 from modules.Keys import KeysCSV as K, KeysGRV as GRV, KeysGS as GS, KeysAoA as AoA
-from modules.Utils import Utils
+from modules.Utils import Utils, Bcolors
 
 
 class Plotter(object):
@@ -135,7 +135,7 @@ class Plotter(object):
             GRV.___lur___(): 3,
         }
 
-    def plot_case1(self, fillins: bool = False):
+    def plot_case1(self, file_name: str = "plot", fillins: bool = False):
         dta = self.__data
 
         # X-axis setup [cbls]
@@ -190,7 +190,8 @@ class Plotter(object):
 
         fig, (ax_grv, ax_gs, ax_aoa, utils) = plt.subplots(4)
         fig.set_size_inches(15, 25)
-
+        fig.text(0.5, 0.05, self.__filename, horizontalalignment='center', verticalalignment='center',
+                           color='red')
         df_X_smooth = np.linspace(
             Utils.mtrs_to_cbls(dta.X.min()),
             Utils.mtrs_to_cbls(dta.X.max()),
@@ -258,6 +259,8 @@ class Plotter(object):
         except:
             ax_grv.plot(Utils.mtrs_to_cbls(dta.X), Utils.mtrs_to_cbls(dta.Z), linewidth=track_line_width,
                         label="Track", color=track_line_colour)
+            ax_grv.text(0.5, 0.5, "XXXXXX", horizontalalignment='center', verticalalignment='center',
+                     color='red')
 
         plot_distance_marks(ax_grv)
 
@@ -303,6 +306,8 @@ class Plotter(object):
         except:
             axins_grv.plot(Utils.mtrs_to_cbls(dta.X), dta.LUE, linewidth=track_line_width, label="Track",
                            color=track_line_colour)
+            axins_grv.text(0.5, 0.5, "XXXXXX", horizontalalignment='center', verticalalignment='center',
+                        color='red')
 
         axins_grv.yaxis.tick_right()
         axins_grv.xaxis.tick_top()
@@ -361,6 +366,8 @@ class Plotter(object):
         except:
             ax_gs.plot(Utils.mtrs_to_cbls(dta.X), dta.Alt, linewidth=track_line_width, label="Track",
                        color=track_line_colour)
+            ax_gs.text(0.5, 0.5, "XXXXXX", horizontalalignment='center', verticalalignment='center',
+                           color='red')
 
         plot_distance_marks(ax_gs)
 
@@ -406,6 +413,8 @@ class Plotter(object):
         except:
             axins_gs.plot(Utils.mtrs_to_cbls(dta.X), dta.GSE, linewidth=track_line_width, label="Track",
                           color=track_line_colour)
+            axins_gs.text(0.5, 0.5, "XXXXXX", horizontalalignment='center', verticalalignment='center',
+                       color='red')
 
         axins_gs.patch.set_alpha(0)
         axins_gs.yaxis.tick_right()
@@ -454,6 +463,8 @@ class Plotter(object):
         except:
             ax_aoa.plot(Utils.mtrs_to_cbls(dta.X), dta.AoA, linewidth=track_line_width, label="Track",
                         color=track_line_colour)
+            ax_aoa.text(0.5, 0.5, "XXXXXX", horizontalalignment='center', verticalalignment='center',
+                          color='red')
 
         plot_distance_marks(ax_aoa)
 
@@ -518,9 +529,11 @@ class Plotter(object):
         except:
             axins_vy.plot(Utils.mtrs_to_cbls(dta.X), dta.Vy, linewidth=track_line_width, label="Track", color=track_line_colour)
             axins_roll.plot(Utils.mtrs_to_cbls(dta.X), dta.Roll, linewidth=track_line_width, label="Track", color=track_line_colour)
+            axins_roll.text(0.5, 0.5, "XXXXXX", horizontalalignment='center', verticalalignment='center',
+                        color='red')
 
         plt.xlim(x_axis_limit_left, x_axis_limit_right)
 
-        plt.savefig('POC.png', bbox_inches='tight', dpi=300)
-        plt.savefig('POC_alpha.png', bbox_inches='tight', dpi=300, transparent=True)
+        plt.savefig(file_name, bbox_inches='tight', dpi=300)
+        # plt.savefig(file_name + "-alpha", bbox_inches='tight', dpi=300, transparent=True)
         plt.show()
