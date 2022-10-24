@@ -141,8 +141,31 @@ class Plotter(object):
             x = kwargs["x"]
             y = kwargs["y"]
             context = kwargs["C"]
-            x = x[-150:]
-            y = y[-150:]
+
+            def downwind_stripper() -> int:
+                x_max = x.max()
+                # print(Bcolors.OKCYAN + "x max: " + str(x_max) + Bcolors.ENDC)
+                downwind = False
+                last_x = -9999
+                downwind_index = None
+                for i, v in x.items():
+                    if v > 0:
+                        if last_x <= v <= x_max:
+                            last_x = v
+                        elif last_x > v <= x_max:
+                            if not downwind_index:
+                                downwind_index = i
+                            # print(i, v, "final")
+
+                        else:
+                            raise Exception("Downwind determination error!")
+                # print(downwind_index)
+                return downwind_index
+
+            downwind_pool = - len(x) + downwind_stripper()
+
+            x = x[downwind_pool:]
+            y = y[downwind_pool:]
 
             X_smooth = np.linspace(x.iloc[:1], x.iloc[-1:], smooth)
 
@@ -150,7 +173,7 @@ class Plotter(object):
             _dfs = _f(X_smooth)
             ax.plot(X_smooth, _dfs, linewidth=track_line_width, label="Track",
                     color=track_line_colour)
-            print(Bcolors.OKBLUE + context + Bcolors.ENDC)
+            # print(Bcolors.OKBLUE + context + Bcolors.ENDC)
 
         dta = self.__data
 
