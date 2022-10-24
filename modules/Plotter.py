@@ -249,12 +249,18 @@ class Plotter(object):
             grv_longitudinal_correction_in_ft = 290
             grv_lateral_correction_in_ft = 0
 
-            def plotter_lul():
-                def lue_plot_limits(limit, colour, label):
-                    axins_grv.plot(
-                        numpy.linspace(limit, limit),
-                        color=colour, alpha=line_alpha, linestyle='--', linewidth=1, label=label)
+            def plotter_lue():
+                axins_grv = ax_grv.inset_axes([.6, 0, .4, .4], transform=None, alpha=0.5, clip_path=None)
+                x1, x2, y1, y2 = 6, 0, -4, 4
+                axins_grv.set_xlim(x1, x2)
+                axins_grv.set_ylim(y1, y2)
+                axins_grv.text(.5, .9, "LUE [deg/cbls]", horizontalalignment='center',
+                               transform=axins_grv.transAxes)
 
+                def lue_plot_limits(limit, colour, label):
+                        axins_grv.plot(
+                            numpy.linspace(limit, limit),
+                            color=colour, alpha=line_alpha, linestyle='--', linewidth=1, label=label)
                 def lue_fill_limits(limit_1, limit_2, colour):
                     axins_grv.fill_between(
                         numpy.linspace(x1, x2, x1),
@@ -262,10 +268,6 @@ class Plotter(object):
                         numpy.linspace(limit_2, limit_2, x1),
                         color=colour, alpha=fill_alpha)
 
-                axins_grv = ax_grv.inset_axes([.6, 0, .4, .4], transform=None, alpha=0.5, clip_path=None)
-                x1, x2, y1, y2 = 6, 0, -4, 4
-                axins_grv.set_xlim(x1, x2)
-                axins_grv.set_ylim(y1, y2)
 
                 lue_plot_limits(grv___lul___limit, 'red', '__LUL__')
                 lue_plot_limits(grv__lul__limit, 'orange', 'LUL')
@@ -281,12 +283,14 @@ class Plotter(object):
                     lue_fill_limits(grv_lur_limit, grv__lur__limit, 'orange')
                     lue_fill_limits(grv__lur__limit, grv___lur___limit, 'red')
 
-                data_interpolate(ax=axins_grv, x=Utils.mtrs_to_cbls(dta.X), y=dta.LUE, X=Utils.mtrs_to_cbls(dta.X), C="ins_groove")
+                data_interpolate(ax=axins_grv, x=Utils.mtrs_to_cbls(dta.X), y=dta.LUE, X=Utils.mtrs_to_cbls(dta.X),
+                                 C="ins_groove")
                 axins_grv.yaxis.tick_right()
                 axins_grv.xaxis.tick_top()
                 axins_grv.invert_yaxis()
                 axins_grv.patch.set_alpha(0)
                 axins_grv.grid(False)
+
             def grove_dev_component(grv_limit: float, x: float, fb_correction: float = 9,
                                     lateral_correction: float = grv_lateral_correction_in_ft) -> float:
                 rads = math.radians(grv_limit + fb_correction)
@@ -330,7 +334,7 @@ class Plotter(object):
             plot_distance_marks(ax_grv)
             ax_grv.invert_xaxis()
             ax_grv.grid(False)
-            plotter_lul()
+            plotter_lue()
 
         def plotter_glideslope():
             gs_y_axis_limit_low = 0
@@ -343,6 +347,8 @@ class Plotter(object):
                 x1, x2, y1, y2 = 6, 0, gse___lo___limit - .5, gse___hi___limit + .5
                 axins_gs.set_xlim(x1, x2)
                 axins_gs.set_ylim(y1, y2)
+                axins_gs.text(.5, .9, "GSE [deg/cbls]", horizontalalignment='center',
+                              transform=axins_gs.transAxes)
 
                 def gse_plot_limits(limit, colour, label):
                     axins_gs.plot(
@@ -503,7 +509,9 @@ class Plotter(object):
                     numpy.linspace(limit_2, limit_2, vyx1),
                     color=colour, alpha=fill_alpha)
 
-            plot_lin_limits(-825, 'red', 'Vy limit', axins_vy)
+            plot_lin_limits(-900, 'red', 'Vy limit', axins_vy)
+            fill_lin_limits(-900, vyy2, 'red', axins_vy)
+            axins_vy.text(.5, .75, "EXTENDED LANDING GEAR INSPECTION", horizontalalignment='center', transform=axins_vy.transAxes)
 
             plot_lin_limits(-2.5, 'green', 'roll limit', axins_roll)
             plot_lin_limits(2.5, 'green', 'roll limit', axins_roll)
