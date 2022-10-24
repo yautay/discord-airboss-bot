@@ -20,8 +20,11 @@ for file in file_list:
 
 file_list = os.listdir(work_dir)
 
-for file in file_list:
+# for file in file_list:
+#     if "CORR" in file:
+#         plotter = Plotter(os.path.join(work_dir, file))
+#         plotter.plot_case1()
+#         plotter.plot_case1(file_name=str(file.strip(".csv")))
 
-    if "CORR" in file:
-        plotter = Plotter(os.path.join(work_dir, file))
-        plotter.plot_case1(file_name=str(file.strip(".csv")))
+plotter = Plotter(os.path.join(work_dir, "CORR-TRAP-_FA-18C_hornet-0008.csv"))
+plotter.plot_case1()
